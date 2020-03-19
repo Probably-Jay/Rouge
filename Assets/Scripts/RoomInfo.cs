@@ -2,32 +2,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-//[CustomEditor(typeof(RoomInfo))]
-//public class RoomEditor : Editor
-//{
+[CustomEditor(typeof(RoomInfo))]
+public class RoomEditor : Editor
+{
 
-//    SerializedProperty roomID;
-//    SerializedProperty roomType;
+    SerializedProperty roomID;
+    SerializedProperty roomType;
 
-//    void OnEnable()
-//    {
-//        roomID = serializedObject.FindProperty("roomID");
-//        roomType = serializedObject.FindProperty("roomType");
-//    }
+    void OnEnable()
+    {
+        roomID = serializedObject.FindProperty("roomID");
+        roomType = serializedObject.FindProperty("roomType");
+    }
 
-//    public override void OnInspectorGUI()
-//    {
-//        serializedObject.Update();
+    public override void OnInspectorGUI()
+    {
+        serializedObject.Update();
 
-//        GUI.enabled = false;
-//        EditorGUILayout.PropertyField(roomID);
-//        GUI.enabled = true;
+        GUI.enabled = false;
+        EditorGUILayout.PropertyField(roomID);
+        GUI.enabled = true;
 
-//        EditorGUILayout.PropertyField(roomType);
+        EditorGUILayout.PropertyField(roomType);
 
-//        serializedObject.ApplyModifiedProperties();
-//    }
-//}
+        serializedObject.ApplyModifiedProperties();
+    }
+}
 
 
 [System.Serializable]
