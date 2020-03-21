@@ -5,7 +5,11 @@ using UnityEditor;
 [CustomEditor(typeof(RoomInfo))]
 public class RoomEditor : Editor
 {
+    //// internal
+    //bool advancedFoldout = false;
+    
 
+    // from roomInfo
     SerializedProperty roomID;
     SerializedProperty roomType;
 
@@ -25,6 +29,12 @@ public class RoomEditor : Editor
 
         EditorGUILayout.PropertyField(roomType);
 
+        //advancedFoldout = EditorGUILayout.Foldout(advancedFoldout, "Advanced");
+        //if (advancedFoldout) // fold down
+        //{
+
+        //}
+
         serializedObject.ApplyModifiedProperties();
     }
 }
@@ -34,7 +44,7 @@ public class RoomEditor : Editor
 public class RoomInfo : MonoBehaviour
 {
     [SerializeField]
-    public int roomID;
+    public int roomID = -1;
 
     [SerializeField]
     public RoomType roomType;
@@ -50,6 +60,7 @@ public class RoomInfo : MonoBehaviour
     {
         
     }
+    [System.Serializable]
     public enum RoomType
     {
         Unnasigned,

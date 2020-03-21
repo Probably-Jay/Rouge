@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &4996456881603807189
+--- !u!1001 &3677649604613442680
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -10,12 +10,12 @@ PrefabInstance:
     - target: {fileID: 2369502201634919094, guid: 81cada56a0d41114a957beb3d8ea4c08,
         type: 3}
       propertyPath: m_Name
-      value: Room_0
+      value: Room_1
       objectReference: {fileID: 0}
     - target: {fileID: 4119298201416235858, guid: 81cada56a0d41114a957beb3d8ea4c08,
         type: 3}
       propertyPath: roomID
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4119298201416235858, guid: 81cada56a0d41114a957beb3d8ea4c08,
         type: 3}
