@@ -28,12 +28,14 @@ public class GameManager : MonoBehaviour
     private Grid mainGrid;
     public Grid MainGrid { get => mainGrid;}
 
-
+    private TilemapManager tilemapManager;
+    public TilemapManager TilemapManager { get => tilemapManager; private set => tilemapManager = value;  }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        tilemapManager = mainGrid.GetComponentInChildren<TilemapManager>();
+        Debug.Log(tilemapManager);
     }
 
     // Update is called once per frame
