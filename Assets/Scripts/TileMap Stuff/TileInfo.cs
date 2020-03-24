@@ -11,7 +11,7 @@ using UnityEngine.Tilemaps;
 public class TileEditor : Editor
 {
 
-    SerializedProperty tile;
+    public SerializedProperty tile;
     public SerializedProperty tileName;
     SerializedProperty tileType;
     SerializedProperty isSolid;
@@ -108,11 +108,11 @@ public class TileEditor : Editor
     {
         isValid = true;
         isValid &= tile.objectReferenceValue != null;
-        if(!(tile.objectReferenceValue != null)) EditorGUILayout.HelpBox("Please select a tile", MessageType.None);
+        if (!(tile.objectReferenceValue != null)) { EditorGUILayout.HelpBox("Please select a tile", MessageType.None); }
         isValid &= tileName.stringValue != "";
-        if (!(tileName.stringValue != "")) EditorGUILayout.HelpBox("Please enter a name", MessageType.None);
+        if (!(tileName.stringValue != "")) { EditorGUILayout.HelpBox("Please enter a name", MessageType.None); }
         isValid &= tileType.intValue != (int)TileInfo.TileTypeEnum.none;
-        if (!(tileType.intValue != (int)TileInfo.TileTypeEnum.none)) EditorGUILayout.HelpBox("Tile cannot be of type 'none' please ask Jake if type is not listed", MessageType.None);
+        if (!(tileType.intValue != (int)TileInfo.TileTypeEnum.none)) { EditorGUILayout.HelpBox("Tile cannot be of type 'none' please ask Jake if type is not listed", MessageType.None); }
         return isValid;
     }
 
@@ -172,7 +172,7 @@ public class TileInfo : ScriptableObject
     [SerializeField]
     public string tileName;
     [SerializeField]
-    public bool isSolid;
+    private bool isSolid;
     [SerializeField]
     public bool canBeOpened;
     [SerializeField]
@@ -188,7 +188,9 @@ public class TileInfo : ScriptableObject
     [SerializeField]
     public long tileAttributes = 0;
 
-    
+    public readonly static string AssetPath = "Assets/Tile Infos/";
+
+    public bool IsSolid { get => isSolid; }
 
     public void Polymorph()
     {

@@ -67,8 +67,26 @@ public class CharacterController : MonoBehaviour
 
         if(!target.HasValue)
         {
-            target = transform.position + (new Vector3((float)direction?.x, (float)direction?.y, 0));
-         //   Debug.Log(target);
+            Vector3Int targetDirection = new Vector3Int((int)direction?.x, (int)direction?.y, 0);
+            target = transform.position + targetDirection;
+            
+            if(targetDirection.magnitude == 1 && GameManager.Instance.TilemapManager.GetTileInfo((Vector3Int.FloorToInt((Vector3)target))).IsSolid)  // solid orthographic
+            {
+                target = null;
+                return;
+            }
+            else // moving diagonally
+            {
+                Vector3Int upDown = new Vector3Int((int)transform.position.x, (int)(float)target?.y, 0);
+                Vector3Int leftRight = new Vector3Int( (int)(float)target?.x,(int)transform.position.y, 0);
+                if(GameManager.Instance.TilemapManager.GetTileInfo(upDown).IsSolid || GameManager.Instance.TilemapManager.GetTileInfo(leftRight).IsSolid)
+                { // one of orthographic is solid
+                    target = null;
+                    return;
+                }
+
+            }
+            
             direction = null;
         }
 
