@@ -12,10 +12,11 @@ public class TileEditor : Editor
 {
 
     SerializedProperty tile;
-    SerializedProperty tileName;
+    public SerializedProperty tileName;
     SerializedProperty tileType;
     SerializedProperty isSolid;
     SerializedProperty canBeOpened;
+    SerializedProperty open;
     SerializedProperty locked;
 
     //SerializedProperty safeTileType;
@@ -23,15 +24,17 @@ public class TileEditor : Editor
 
     //TileInfo.TileTypeEnum currentType = TileInfo.TileTypeEnum.none;
 
-    int currentType = (int)TileInfo.TileTypeEnum.none;
+    int currentType;
     void OnEnable()
     {
         tile = serializedObject.FindProperty("tile");
-        tileName = serializedObject.FindProperty("name");
+        tileName = serializedObject.FindProperty("tileName");
         tileType = serializedObject.FindProperty("tileType");
         isSolid = serializedObject.FindProperty("isSolid");
         canBeOpened = serializedObject.FindProperty("canBeOpened");
+        open = serializedObject.FindProperty("open");
         locked = serializedObject.FindProperty("locked");
+        currentType = tileType.intValue;
 
         //safeTileType = serializedObject.FindProperty("safeTileTypeHack");
         //TileTypeToSafeEnum = serializedObject.FindProperty("TileTypeToSafeEnum");
@@ -39,51 +42,74 @@ public class TileEditor : Editor
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
-        
-        
-        switch ((TileInfo.TileTypeEnum)currentType)
+
+        if (currentType != (int)TileInfo.TileTypeEnum.other)
         {
-            case TileInfo.TileTypeEnum.none:
-                BaseTileEditorDraw();
-                EditorGUILayout.HelpBox("Tile type cannot be none", MessageType.Warning);
-                break;
-            case TileInfo.TileTypeEnum.floor:
-                FloorTileEditorDraw();
-                break;
-            case TileInfo.TileTypeEnum.wall:
-                WallTileEditorDraw();
-                break;
-            case TileInfo.TileTypeEnum.door:
-                DoorTileEditorDraw();
-                break;
-            case TileInfo.TileTypeEnum.solidOrnament:
-                SolidOrnamentTileEditorDraw();
-                break;
-            case TileInfo.TileTypeEnum.decorativeOrnament:
-                DecorativeOrnamentTileEditorDraw();
-                break;
-            default:
-                BaseTileEditorDraw();
-                EditorGUILayout.HelpBox("Tile type cannot be default, did you forget to implement this case: " + currentType.ToString(), MessageType.Error);
-                break;
+
+            foreach (TileInfo.TileTypeEnum mask in System.Enum.GetValues(typeof(TileInfo.TileFeature)))
+            {
+                if (mask == 0)
+                {
+                    BaseTileEditorDraw();
+                    continue;
+                }
+
+
+                int match = currentType & (int)mask;
+
+                //Debug.Log((int)currentType + " " + (int)mask + " " + match);
+
+                switch ((TileInfo.TileFeature)match)
+                {
+                    case TileInfo.TileFeature.none:
+                        break;
+                    case TileInfo.TileFeature.walkable:
+                        DrawWalkableEditor();
+                        break;
+                    case TileInfo.TileFeature.solid:
+                        DrawSolidEditor();
+                        break;
+                    case TileInfo.TileFeature.openable:
+                        DrawOpenableEditor();
+                        break;
+                    case TileInfo.TileFeature.lockable:
+                        break;
+                    case TileInfo.TileFeature.ornament:
+                        break;
+                    default:
+                        EditorGUILayout.HelpBox("This tile feature (" + match + ": " + ((TileInfo.TileFeature)match).ToString() + " is not recognised, did you forget to implement it?", MessageType.None);
+                        break;
+                }
+            }
+
+            if(currentType == (int)TileInfo.TileTypeEnum.none)
+            {
+                EditorGUILayout.HelpBox("Tile cannot be of type 'none' please use other if type is not defined", MessageType.Warning);
+            }
         }
-        
+        else
+        {
+            DrawAllEditor();
+        }
 
         serializedObject.ApplyModifiedProperties();
-
 
         if (currentType != tileType.intValue)
         {
             ((TileInfo)serializedObject.targetObject).Polymorph();
             currentType = (int)tileType.intValue;
         }
-        //currentType = (TileInfo.TileTypeEnum)tileType.enumValueIndex;
-       
-        serializedObject.ApplyModifiedProperties();
-       
+        //serializedObject.ApplyModifiedProperties();
     }
 
-
+    private void DrawAllEditor()
+    {
+        BaseTileEditorDraw();
+        EditorGUILayout.PropertyField(isSolid);
+        EditorGUILayout.PropertyField(canBeOpened);
+        EditorGUILayout.PropertyField(open);
+        EditorGUILayout.PropertyField(locked);
+    }
 
     private void BaseTileEditorDraw()
     {
@@ -95,59 +121,48 @@ public class TileEditor : Editor
         //safeTileType.intValue = (int)(TileInfo.TileTypeEnum)EditorGUILayout.EnumPopup(currentType);
 
     }
-
-    private void FloorTileEditorDraw()
+    private void DrawWalkableEditor()
     {
-        BaseTileEditorDraw();
         GUI.enabled = false;
         EditorGUILayout.PropertyField(isSolid);
         GUI.enabled = true;
     }
 
-    private void WallTileEditorDraw()
+    private void DrawSolidEditor()
     {
-        BaseTileEditorDraw();
         GUI.enabled = false;
         EditorGUILayout.PropertyField(isSolid);
         GUI.enabled = true;
     }
 
-    private void DoorTileEditorDraw()
+
+    private void DrawOpenableEditor()
     {
-        WallTileEditorDraw();
         GUI.enabled = false;
         EditorGUILayout.PropertyField(canBeOpened);
         GUI.enabled = true;
+        EditorGUILayout.PropertyField(open);
         EditorGUILayout.PropertyField(locked);
     }
 
-    private void SolidOrnamentTileEditorDraw()
-    {
-        WallTileEditorDraw();
-        throw new NotImplementedException();
-    }
-
-    private void DecorativeOrnamentTileEditorDraw()
-    {
-        FloorTileEditorDraw();
-        throw new NotImplementedException();
-    }
+   
 
 }
 
-
-[System.Serializable]
+    [System.Serializable]
 [CreateAssetMenu(menuName = "Tile Info") ]
 public class TileInfo : ScriptableObject
 {
     [SerializeField]
-    public Tile tile;
+    public Texture2D tile;
     [SerializeField]
-    public new string name;
+    public string tileName;
     [SerializeField]
     public bool isSolid;
     [SerializeField]
     public bool canBeOpened;
+    [SerializeField]
+    public bool open;
     [SerializeField]
     public bool locked;
 
@@ -155,29 +170,15 @@ public class TileInfo : ScriptableObject
     public TileTypeEnum tileType;
 
     
-    //public int safeTileTypeHack;
 
     [SerializeField]
     public long tileAttributes = 0;
 
     
-    public TileInfo(Tile _tile, string _name, TileTypeEnum type)
-    {
-        tile = _tile;
-        name = _name;
-
-        Polymorph();
-
-    }
-    
 
     public void Polymorph()
     {
-       // TileTypeEnum safeIndex = (TileTypeEnum)safeTileTypeHack;
-       // Debug.Log(safeIndex);
-
-        //tileType = safeEnumToActualType[safeIndex]; // im sorry
-
+       
         switch (tileType)
         {
             case TileTypeEnum.none:
@@ -198,16 +199,25 @@ public class TileInfo : ScriptableObject
             case TileTypeEnum.decorativeOrnament:
                 DecorativeOrnamentTilePolymorph();
                 break;
+            case TileTypeEnum.other:
+                OtherTilePolymorph();
+                break;
             default:
-                throw new Exception("Unknown tile type value: " + tileType + " "+ name);
+                Debug.LogError("Unknown tile type value: " + tileType + " at tile '"+ tileName+"'");
                 break;
         }
+    }
+
+    private void OtherTilePolymorph()
+    {
+        BaseTilePolymorph();
     }
 
     private void BaseTilePolymorph()
     {
         isSolid = false;
         canBeOpened = false;
+        open = false;
         locked = false;
         Debug.Log("Updeted");
     }
@@ -230,21 +240,28 @@ public class TileInfo : ScriptableObject
         locked = true;
     }
 
+    private void DecorativeOrnamentTilePolymorph() // simulated inheritance from floor tile
+    {
+        FloorTilePolymorph();
+        
+    }
+
     private void SolidOrnamentTilePolymorph() // simulated inheritance from wall tile
     {
         WallTilePolymorph();
-        throw new NotImplementedException();
-    }
-    private void DecorativeOrnamentTilePolymorph() // simulated inheritance from floor tile
-    {
-        BaseTilePolymorph();
-        throw new NotImplementedException();
+        
     }
 
 
     static bool canOpen(TileInfo tile)
     {
-        return tile.tileType.HasFlag(TileBase.openable);    
+        return tile.tileType.HasFlag(TileFeature.openable);    
+    }
+
+    private void OnValidate()
+    {
+        name = this.tileName;
+        //tileName = this.name;
     }
 
     //Dictionary<TileTypeEnum, CommonTypeEnum> safeEnumToActualType = new Dictionary<TileTypeEnum, CommonTypeEnum>()
@@ -256,7 +273,7 @@ public class TileInfo : ScriptableObject
     //    {TileTypeEnum.solidOrnament,CommonTypeEnum.solidOrnament },
     //    {TileTypeEnum.decorativeOrnament,CommonTypeEnum.decorativeOrnament },
     //};
-    
+
 
     //public enum TileTypeEnum
     //{
@@ -273,23 +290,29 @@ public class TileInfo : ScriptableObject
     public enum TileTypeEnum
     {
         none = 0,
-        floor = TileBase.walkable,
-        wall = TileBase.solid,
-        door = TileBase.solid | TileBase.openable | TileBase.lockable,
-        solidOrnament = TileBase.solid | TileBase.ornament,
-        decorativeOrnament = TileBase.walkable | TileBase.ornament,
+        floor = TileFeature.walkable,
+        wall = TileFeature.solid,
+        door = TileFeature.solid | TileFeature.openable | TileFeature.lockable,
+        solidOrnament = TileFeature.solid | TileFeature.ornament,
+        decorativeOrnament = TileFeature.walkable | TileFeature.ornament,
+
+        other = System.Int32.MaxValue
     }
 
-    [Flags] enum TileBase
+    [Flags] public enum TileFeature
     {
         none = 0,
         walkable =      (1 << 0),
         solid =         (1 << 1),
         openable =      (1 << 2),
+        //open = TileFeature.openable | TileFeature.walkable,
+       // closed = TileFeature.openable | TileFeature.solid,
         lockable =      (1 << 3),
+        //locked = TileFeature.lockable
         ornament =      (1 << 4),
     }
 }
+
 
 
 

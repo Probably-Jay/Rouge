@@ -68,7 +68,7 @@ public class CharacterController : MonoBehaviour
         if(!target.HasValue)
         {
             target = transform.position + (new Vector3((float)direction?.x, (float)direction?.y, 0));
-            Debug.Log(target);
+         //   Debug.Log(target);
             direction = null;
         }
 

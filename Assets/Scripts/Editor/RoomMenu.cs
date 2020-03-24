@@ -9,7 +9,7 @@ public class RoomMenu : EditorWindow
     //string Title;
 
     [SerializeField]
-    RoomInfo.RoomType roomType = RoomInfo.RoomType.Unnasigned;
+    RoomInfo.RoomType roomType = RoomInfo.RoomType.Normal;
 
     [SerializeField]    
     int roomID;
@@ -23,7 +23,7 @@ public class RoomMenu : EditorWindow
 
     //  GameObject roomPrefab;
 
-    [MenuItem("MyTools/New Room...")]
+    [MenuItem("HelperTools/New Room...")]
     static void Init()
     {
         Object source = Resources.Load("Prefabs/Room");
@@ -53,6 +53,8 @@ public class RoomMenu : EditorWindow
 
         RoomMenu window = (RoomMenu)EditorWindow.GetWindow(typeof(RoomMenu));
         window.roomID = nextRoomNumber;
+        DestroyImmediate(room); // cleanup
+
         window.Show();
     }
 
@@ -113,10 +115,11 @@ public class RoomMenu : EditorWindow
         Object prefab = PrefabUtility.SaveAsPrefabAsset(room, "Assets/Rooms/" + room.name + ".prefab", out sucess);
         if (!sucess) { Debug.LogError("Prefab not created"); }
 
+        DestroyImmediate(room); // cleanup
+
         AssetDatabase.OpenAsset(prefab);
 
 
-        DestroyImmediate(room); // cleanup
 
 
     }
