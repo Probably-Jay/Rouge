@@ -27,7 +27,7 @@ public class TileEditor : Editor
     void OnEnable()
     {
         tile = serializedObject.FindProperty("tile");
-        tileName = serializedObject.FindProperty("tileName");
+        tileName = serializedObject.FindProperty("name");
         tileType = serializedObject.FindProperty("tileType");
         isSolid = serializedObject.FindProperty("isSolid");
         canBeOpened = serializedObject.FindProperty("canBeOpened");
@@ -71,19 +71,14 @@ public class TileEditor : Editor
 
         serializedObject.ApplyModifiedProperties();
 
+
         if (currentType != tileType.intValue)
         {
             ((TileInfo)serializedObject.targetObject).Polymorph();
-            currentType = (int)tileType.enumValueIndex;
+            currentType = (int)tileType.intValue;
         }
         //currentType = (TileInfo.TileTypeEnum)tileType.enumValueIndex;
-        
-        /// //if (currentType != (TileInfo.TileTypeEnum)safeTileType.intValue)
-        //{
-        //    ((TileInfo)serializedObject.targetObject).Polymorph();
-        //    currentType = (TileInfo.TileTypeEnum)safeTileType.intValue;
-        //}
-        ////currentType = (TileInfo.TileType)tileType.intValue;
+       
         serializedObject.ApplyModifiedProperties();
        
     }
@@ -95,12 +90,8 @@ public class TileEditor : Editor
         EditorGUILayout.PropertyField(tile);
         EditorGUILayout.PropertyField(tileName);
         EditorGUILayout.PropertyField(tileType);
-        if(tileType.enumValueIndex != currentType)
-        {
-            int a = 5;
-        }
-        Debug.Log(tileType.enumValueIndex + "  " +tileType.intValue);
-        //tileType.enumValueIndex = 0;
+
+        
         //safeTileType.intValue = (int)(TileInfo.TileTypeEnum)EditorGUILayout.EnumPopup(currentType);
 
     }
@@ -146,13 +137,13 @@ public class TileEditor : Editor
 
 
 [System.Serializable]
-[ExecuteInEditMode]
-public class TileInfo : MonoBehaviour
+[CreateAssetMenu(menuName = "Tile Info") ]
+public class TileInfo : ScriptableObject
 {
     [SerializeField]
     public Tile tile;
     [SerializeField]
-    public string tileName;
+    public new string name;
     [SerializeField]
     public bool isSolid;
     [SerializeField]
@@ -173,9 +164,8 @@ public class TileInfo : MonoBehaviour
     public TileInfo(Tile _tile, string _name, TileTypeEnum type)
     {
         tile = _tile;
-        tileName = _name;
-        //tileType = type;
-        //safeTileTypeHack = (int)type;
+        name = _name;
+
         Polymorph();
 
     }
@@ -191,7 +181,7 @@ public class TileInfo : MonoBehaviour
         switch (tileType)
         {
             case TileTypeEnum.none:
-                throw new Exception("Tile type cannot be none: " + tileName);
+                BaseTilePolymorph();
                 break;
             case TileTypeEnum.floor:
                 FloorTilePolymorph();
@@ -209,7 +199,7 @@ public class TileInfo : MonoBehaviour
                 DecorativeOrnamentTilePolymorph();
                 break;
             default:
-                throw new Exception("Unknown tile type value: " + tileType + " "+ tileName);
+                throw new Exception("Unknown tile type value: " + tileType + " "+ name);
                 break;
         }
     }
@@ -268,27 +258,27 @@ public class TileInfo : MonoBehaviour
     //};
     
 
+    //public enum TileTypeEnum
+    //{
+    //    none = 0,
+    //    floor,
+    //    wall,
+    //    door,
+    //    solidOrnament,
+    //    decorativeOrnament,
+
+    //    other,
+    //}
+
     public enum TileTypeEnum
     {
         none = 0,
-        floor,
-        wall,
-        door,
-        solidOrnament,
-        decorativeOrnament,
-
-        other,
+        floor = TileBase.walkable,
+        wall = TileBase.solid,
+        door = TileBase.solid | TileBase.openable | TileBase.lockable,
+        solidOrnament = TileBase.solid | TileBase.ornament,
+        decorativeOrnament = TileBase.walkable | TileBase.ornament,
     }
-
-    //public enum CommonTypeEnum
-    //{
-    //    none = 0,
-    //    floor = TileBase.walkable,
-    //    wall = TileBase.solid,
-    //    door = TileBase.solid | TileBase.openable | TileBase.lockable,
-    //    solidOrnament = TileBase.solid | TileBase.ornament,
-    //    decorativeOrnament = TileBase.walkable | TileBase.ornament,
-    //}
 
     [Flags] enum TileBase
     {
