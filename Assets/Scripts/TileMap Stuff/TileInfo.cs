@@ -19,6 +19,8 @@ public class TileEditor : Editor
     SerializedProperty open;
     SerializedProperty locked;
 
+     bool isValid;
+
     //SerializedProperty safeTileType;
     //SerializedProperty TileTypeToSafeEnum;
 
@@ -35,6 +37,7 @@ public class TileEditor : Editor
         open = serializedObject.FindProperty("open");
         locked = serializedObject.FindProperty("locked");
         currentType = tileType.intValue;
+        isValid = true;
 
         //safeTileType = serializedObject.FindProperty("safeTileTypeHack");
         //TileTypeToSafeEnum = serializedObject.FindProperty("TileTypeToSafeEnum");
@@ -82,16 +85,15 @@ public class TileEditor : Editor
                 }
             }
 
-            if(currentType == (int)TileInfo.TileTypeEnum.none)
-            {
-                EditorGUILayout.HelpBox("Tile cannot be of type 'none' please use other if type is not defined", MessageType.Warning);
-            }
+           
         }
         else
         {
             DrawAllEditor();
         }
 
+
+        
         serializedObject.ApplyModifiedProperties();
 
         if (currentType != tileType.intValue)
@@ -100,6 +102,18 @@ public class TileEditor : Editor
             currentType = (int)tileType.intValue;
         }
         //serializedObject.ApplyModifiedProperties();
+    }
+
+    public bool IsValid()
+    {
+        isValid = true;
+        isValid &= tile.objectReferenceValue != null;
+        if(!(tile.objectReferenceValue != null)) EditorGUILayout.HelpBox("Please select a tile", MessageType.None);
+        isValid &= tileName.stringValue != "";
+        if (!(tileName.stringValue != "")) EditorGUILayout.HelpBox("Please enter a name", MessageType.None);
+        isValid &= tileType.intValue != (int)TileInfo.TileTypeEnum.none;
+        if (!(tileType.intValue != (int)TileInfo.TileTypeEnum.none)) EditorGUILayout.HelpBox("Tile cannot be of type 'none' please ask Jake if type is not listed", MessageType.None);
+        return isValid;
     }
 
     private void DrawAllEditor()
@@ -154,7 +168,7 @@ public class TileEditor : Editor
 public class TileInfo : ScriptableObject
 {
     [SerializeField]
-    public Texture2D tile;
+    public Tile tile;
     [SerializeField]
     public string tileName;
     [SerializeField]

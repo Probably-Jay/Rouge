@@ -15,7 +15,7 @@ public class TileMenu : EditorWindow
     SerializedObject tile;
     TileEditor editor;
 
-
+    bool isValid = true;
 
 
     [MenuItem("HelperTools/New tile..")]
@@ -34,25 +34,45 @@ public class TileMenu : EditorWindow
     {
         GUILayout.Label("Create new tile", EditorStyles.boldLabel);
         editor.OnInspectorGUI();
-        
 
-        if (GUILayout.Button("Create New Tile"))
+        isValid = editor.IsValid();
+        if (isValid)
         {
-            Create();
+            if (GUILayout.Button("Create New Tile"))
+            {
+                if (Create()) {// true if sucessful
+                    Close(); 
+                }
+            }
+        }
+        
+        if (GUILayout.Button("Cancel"))
+        {
             Close();
         }
         
     }
 
-    private void Create()
+    private bool Create()
     {
-
-        AssetDatabase.CreateAsset(tileObject, "Assets/Tile Infos/"+editor.tileName.stringValue + ".asset");
+        string fileName = "Assets/Tile Infos/" + editor.tileName.stringValue + ".asset";
+        if (AssetDatabase.FindAssets(fileName) != null)
+        {
+            if (!EditorUtility.DisplayDialog("Tile already exists with that name",
+                "It looks like you're trying to create a tile with the " +
+                "same name as one that already exists, did you mean to do that?",
+                "Yes, Overwrite the existing tile",
+                "Cancel"))
+            {
+                return false; // cancel
+            }
+        }
+        AssetDatabase.CreateAsset(tileObject, fileName);
         AssetDatabase.SaveAssets();
         EditorUtility.FocusProjectWindow();
 
         Selection.activeObject = tileObject;
-
+        return true;
 
 
         

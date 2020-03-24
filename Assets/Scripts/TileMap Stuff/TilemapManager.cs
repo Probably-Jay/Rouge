@@ -6,18 +6,19 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 
+//[CustomPropertyDrawer]
+
 public class TilemapManager : MonoBehaviour
 {
     //[SerializeField]
     //TileInfo tile;
 
-    [SerializeField]
-    ScriptableObject obj;
+    
 
     // Start is called before the first frame update
     void Start()
     {
-        obj = ScriptableObject.CreateInstance("TileInfo");
+       
     }
 
     // Update is called once per frame
